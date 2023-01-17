@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dhaydamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/01/17 15:01:46 by dhaydamo          #+#    #+#             */
+/*   Updated: 2023/01/17 15:05:37 by dhaydamo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
 ssize_t	read_line(t_buffer *buffer, int fd)
@@ -25,7 +37,7 @@ size_t	buff_len(t_buffer *buffer)
 	{
 		acc++;
 		if (content[filled + acc - 1] == '\n')
-			break;
+			break ;
 	}
 	return (acc);
 }
@@ -55,13 +67,12 @@ char	*cat_buff(t_buffer *buffer, t_line *line)
 
 char	*get_next_line(int fd)
 {
-	t_line		line;
-	t_buffer	*buffer;
+	t_line			line;
+	t_buffer		*buffer;
 	static t_buffer	*first_buffer = NULL;
 
 	line.len = 0;
 	line.content = NULL;
-
 	buffer = get_buffer(&first_buffer, fd);
 	if (!buffer)
 		return (NULL);
@@ -70,23 +81,14 @@ char	*get_next_line(int fd)
 		if (buffer->pos == buffer->len)
 		{
 			if (read_line(buffer, fd) < 0)
-			{
-				delete_buffer(&first_buffer, fd);
-				free(line.content);
-				return (NULL);
-			}
+				return (delete_buffer(&first_buffer, fd), free(line.content),
+					NULL);
 			if (!buffer->len)
-			{
-				delete_buffer(&first_buffer, fd);
-				return (line.content);
-			}
+				return (delete_buffer(&first_buffer, fd), line.content);
 		}
 		line.content = cat_buff(buffer, &line);
-		if (!line.content)
-		{
-			delete_buffer(&first_buffer, fd);
-			return (NULL);
-		}
+		if (!(line.content))
+			return (delete_buffer(&first_buffer, fd), NULL);
 		if (buffer->buff[buffer->pos - 1] == '\n')
 			return (line.content);
 	}
